@@ -1,0 +1,11 @@
+{
+  "name": "MY DAY — مدیریت روزانه",
+  "short_name": "MY DAY",
+  "lang": "fa",
+  "dir": "rtl",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#080f1d",
+  "theme_color": "#080f1d",
+  "description": "مدیریت وظایف، عادت‌ها و یادداشت‌های روزانه"
+}

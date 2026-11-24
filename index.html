@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#080f1d">
+  <meta name="description" content="MY DAY — مدیریت روزانه زندگی">
+  <link rel="manifest" href="manifest.webmanifest">
+  <title>MY DAY</title>
+  <style>
+    :root {
+      --bg:#080f1d; --panel:#101d31; --panel2:#14243d; --line:#263b59;
+      --blue:#397ccb; --ice:#8fc5ff; --white:#f4f8ff; --muted:#8fa2bb;
+      --red:#f07878; --pending:#a9b8ca; --shadow:0 14px 40px #02081266;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:radial-gradient(ellipse at 50% -15%,#19345a 0%,var(--bg) 48%);color:var(--white);font-family:Tahoma,"Segoe UI",sans-serif;min-height:100vh}
+    button,input,textarea,select{font:inherit}
+    button{cursor:pointer}
+    .app{max-width:760px;margin:auto;padding:18px 16px calc(100px + env(safe-area-inset-bottom))}
+    header{display:flex;align-items:center;justify-content:space-between;padding:8px 2px 22px}
+    .brand{font-size:20px;font-weight:800;letter-spacing:2px;color:var(--white)}
+    .brand span{color:var(--ice)}
+    .tiny{font-size:11px;color:var(--muted);margin-top:5px}
+    .avatar{width:40px;height:40px;border-radius:14px;background:linear-gradient(145deg,#244a78,#13243d);display:grid;place-items:center;color:var(--ice);border:1px solid #35577e}
+    .date-card{background:linear-gradient(135deg,#142945,#101d31 70%);border:1px solid #29415f;border-radius:24px;padding:20px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+    .date-card:after{content:"";position:absolute;width:170px;height:170px;border-radius:50%;background:#397ccb18;left:-60px;top:-80px}
+    .date-top{display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:1}
+    .date-label{color:var(--ice);font-size:12px}
+    .solar{font-size:31px;font-weight:800;margin-top:8px;letter-spacing:-1px}
+    .greg{font-size:12px;color:var(--muted);margin-top:8px}
+    .clock{font-size:22px;font-weight:700;color:var(--ice);direction:ltr}
+    .clock-label{font-size:10px;color:var(--muted);text-align:left;margin-top:5px}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0 24px}
+    .stat{background:#101d31;border:1px solid #203653;border-radius:17px;padding:13px 10px}
+    .stat strong{display:block;font-size:21px;margin-bottom:5px}
+    .stat span{font-size:11px;color:var(--muted)}
+    .section-head{display:flex;align-items:center;justify-content:space-between;margin:22px 2px 12px}
+    h2{font-size:16px;margin:0}
+    .sub{font-size:11px;color:var(--muted);margin-top:5px}
+    .btn{border:0;border-radius:13px;padding:11px 15px;background:var(--blue);color:white;font-weight:700}
+    .btn.secondary{background:#1a2d48;border:1px solid #345276;color:var(--ice)}
+    .btn.ghost{background:transparent;color:var(--muted);padding:8px}
+    .progress-wrap{background:#101d31;border:1px solid #203653;border-radius:17px;padding:14px;margin-bottom:18px}
+    .progress-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:10px}
+    .track{height:7px;background:#263b59;border-radius:20px;overflow:hidden}
+    .fill{height:100%;background:linear-gradient(90deg,#397ccb,#8fc5ff);width:0%;border-radius:20px;transition:width .25s}
+    .task-list{display:grid;gap:10px}
+    .task{background:linear-gradient(145deg,#14243d,#101d31);border:1px solid #263d5d;border-radius:17px;padding:14px;display:flex;gap:12px;align-items:flex-start;box-shadow:0 7px 20px #02081222}
+    .task.done{opacity:.66}
+    .task-main{flex:1;min-width:0}
+    .task-title{font-size:14px;font-weight:700;line-height:1.6;overflow-wrap:anywhere}
+    .task.done .task-title{text-decoration:line-through;color:#9aacc2}
+    .task-meta{display:flex;gap:9px;flex-wrap:wrap;color:var(--muted);font-size:11px;margin-top:7px}
+    .priority{color:var(--ice)}
+    .note{font-size:11px;color:#aabbd0;margin-top:8px;line-height:1.7;white-space:pre-wrap}
+    .status-btn{width:35px;height:35px;flex:0 0 35px;border-radius:12px;background:#1a2b43;border:1px solid #3b5678;color:var(--pending);font-size:18px}
+    .status-btn.done{color:var(--ice);border-color:#397ccb;background:#17365a}
+    .status-btn.no{color:var(--red);border-color:#78464d}
+    .task-actions{display:flex;gap:3px;align-items:center}
+    .icon-btn{border:0;background:transparent;color:#91a7c2;padding:5px;font-size:15px}
+    .empty{border:1px dashed #34506f;border-radius:18px;text-align:center;padding:30px 16px;color:var(--muted);font-size:13px;line-height:2}
+    .quick{position:fixed;bottom:calc(77px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);z-index:5;width:min(90%,480px);display:flex;justify-content:center}
+    .quick button{border:1px solid #8fc5ff66;background:linear-gradient(110deg,#2868b2,#397ccb);box-shadow:0 10px 28px #07172dcc;color:white;border-radius:16px;padding:14px 22px;font-weight:800;width:100%}
+    nav{position:fixed;bottom:0;left:0;right:0;z-index:6;background:#0b1525ed;backdrop-filter:blur(18px);border-top:1px solid #263b59;padding:9px 8px calc(9px + env(safe-area-inset-bottom));display:flex;justify-content:center}
+    .nav-inner{width:min(760px,100%);display:grid;grid-template-columns:repeat(5,1fr);gap:3px}
+    .nav-item{border:0;background:transparent;color:#8297b1;border-radius:12px;padding:7px 2px;font-size:10px;display:grid;gap:5px;justify-items:center}
+    .nav-item b{font-size:18px;font-weight:400}
+    .nav-item.active{background:#172b47;color:var(--ice)}
+    .modal-back{position:fixed;inset:0;background:#020812b8;z-index:10;display:none;align-items:flex-end;justify-content:center;padding:12px}
+    .modal-back.show{display:flex}
+    .modal{width:min(100%,560px);max-height:90vh;overflow:auto;background:#101d31;border:1px solid #345071;border-radius:24px;padding:20px;box-shadow:var(--shadow)}
+    .modal h3{margin:0 0 18px;font-size:17px}
+    .field{display:grid;gap:7px;margin:12px 0}
+    .field label{font-size:12px;color:#b5c5d9}
+    .field input,.field textarea,.field select{width:100%;background:#0b1728;border:1px solid #304966;color:var(--white);border-radius:12px;padding:12px;outline:none}
+    .field textarea{min-height:75px;resize:vertical}
+    .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--ice)}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .modal-actions{display:flex;gap:9px;margin-top:18px}
+    .modal-actions>*{flex:1}
+    .view{display:none}.view.active{display:block}
+    .plain-card{background:#101d31;border:1px solid #263b59;border-radius:18px;padding:16px;margin-bottom:12px}
+    .muted{color:var(--muted);font-size:12px;line-height:1.8}
+    .day-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #263b59;font-size:13px}
+    .day-row:last-child{border:0}
+    .calendar-input{background:#101d31;border:1px solid #304966;border-radius:12px;color:white;padding:10px}
+    .toast{position:fixed;top:16px;left:50%;transform:translate(-50%,-15px);opacity:0;pointer-events:none;background:#1c385a;border:1px solid #4778ae;color:white;padding:11px 16px;border-radius:12px;z-index:20;font-size:12px;transition:.2s}
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+    @media(min-width:650px){.app{padding-top:28px}.modal-back{align-items:center}.quick{bottom:88px}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div><div class="brand">MY <span>DAY</span></div><div class="tiny">روزت رو آگاهانه بساز</div></div>
+    <div class="avatar">✦</div>
+  </header>
+
+  <main>
+    <section class="view active" id="homeView">
+      <div class="date-card">
+        <div class="date-top">
+          <div>
+            <div class="date-label">امروز، روز توئه</div>
+            <div class="solar" id="persianDate">—</div>
+            <div class="greg" id="gregDate">—</div>
+          </div>
+          <div><div class="clock" id="clock">--:--</div><div class="clock-label">ساعت محلی</div></div>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><strong id="totalCount">۰</strong><span>کل وظایف</span></div>
+        <div class="stat"><strong id="doneCount">۰</strong><span>انجام‌شده</span></div>
+        <div class="stat"><strong id="scoreCount">۰٪</strong><span>عملکرد امروز</span></div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>پیشرفت امروز</span><strong id="progressText">۰٪</strong></div>
+        <div class="track"><div class="fill" id="progressFill"></div></div>
+      </div>
+      <div class="section-head">
+        <div><h2>وظایف امروز</h2><div class="sub" id="taskSubtitle">قدم‌های کوچک، نتیجه‌های بزرگ</div></div>
+        <button class="btn secondary" id="addTop">＋ افزودن</button>
+      </div>
+      <div class="task-list" id="taskList"></div>
+    </section>
+
+    <section class="view" id="calendarView">
+      <div class="section-head"><div><h2>تقویم و تاریخچه</h2><div class="sub">وظایف روزهای مختلف را ببین</div></div></div>
+      <div class="plain-card">
+        <div class="field"><label>انتخاب روز</label><input class="calendar-input" type="date" id="historyDate"></div>
+        <div class="muted" id="historySummary">یک روز را انتخاب کن.</div>
+      </div>
+      <div id="historyList" class="task-list"></div>
+    </section>
+
+    <section class="view" id="habitsView">
+      <div class="section-head"><div><h2>عادت‌ها</h2><div class="sub">عادت‌ها هر روز از نو شروع می‌شوند</div></div><button class="btn secondary" id="addHabit">＋ عادت</button></div>
+      <div class="plain-card muted">عادت‌ها از وظایف روزانه جدا هستند و به روز بعد منتقل نمی‌شوند.</div>
+      <div id="habitList" class="task-list"></div>
+    </section>
+
+    <section class="view" id="journalView">
+      <div class="section-head"><div><h2>فضای شخصی</h2><div class="sub">جایی برای فکرها و اتفاق‌های امروز</div></div></div>
+      <div class="plain-card">
+        <div class="field"><label>یادداشت روزانه</label><textarea id="journalText" placeholder="امروز چه چیزی در ذهنت می‌گذرد؟"></textarea></div>
+        <button class="btn" id="saveJournal">ذخیره یادداشت</button>
+      </div>
+      <div class="plain-card">
+        <h2>هدف‌های ماهانه</h2>
+        <div class="field"><input id="goalInput" placeholder="مثلاً تمام کردن یک کتاب"></div>
+        <button class="btn secondary" id="addGoal">افزودن هدف</button>
+        <div id="goalList" style="margin-top:12px"></div>
+      </div>
+    </section>
+
+    <section class="view" id="reportsView">
+      <div class="section-head"><div><h2>گزارش‌ها</h2><div class="sub">نگاهی به روندت</div></div></div>
+      <div class="plain-card">
+        <div class="muted">عملکرد امروز</div>
+        <div style="font-size:32px;font-weight:800;color:var(--ice);margin:8px 0" id="reportScore">۰٪</div>
+        <div class="muted" id="reportDetail">هنوز وظیفه‌ای ثبت نشده است.</div>
+      </div>
+      <div class="plain-card">
+        <h2>هفت روز اخیر</h2>
+        <div id="weeklyReport" style="margin-top:12px"></div>
+      </div>
+      <div class="plain-card">
+        <h2>روزهای موفق متوالی</h2>
+        <div style="font-size:30px;color:var(--ice);font-weight:800;margin-top:8px" id="streak">۰ روز</div>
+        <div class="muted">روز موفق یعنی تمام وظایف ثبت‌شده آن روز انجام شده باشند.</div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="quick"><button id="quickAdd">＋ افزودن وظیفه جدید</button></div>
+<nav><div class="nav-inner">
+  <button class="nav-item active" data-view="homeView"><b>⌂</b>خانه</button>
+  <button class="nav-item" data-view="calendarView"><b>▦</b>تقویم</button>
+  <button class="nav-item" data-view="habitsView"><b>◉</b>عادت‌ها</button>
+  <button class="nav-item" data-view="journalView"><b>✎</b>فضای شخصی</button>
+  <button class="nav-item" data-view="reportsView"><b>▤</b>گزارش‌ها</button>
+</div></nav>
+
+<div class="modal-back" id="taskModal">
+  <div class="modal">
+    <h3 id="modalTitle">وظیفه جدید</h3>
+    <form id="taskForm">
+      <input type="hidden" id="taskId">
+      <div class="field"><label for="taskName">عنوان وظیفه</label><input id="taskName" required maxlength="120" placeholder="مثلاً مطالعه زبان"></div>
+      <div class="two">
+        <div class="field"><label for="taskTime">ساعت</label><input id="taskTime" type="time"></div>
+        <div class="field"><label for="taskPriority">اولویت</label><select id="taskPriority"><option value="normal">معمولی</option><option value="high">بالا ★</option></select></div>
+      </div>
+      <div class="field"><label for="taskStatus">وضعیت</label><select id="taskStatus"><option value="pending">در حال انتظار ○</option><option value="done">انجام‌شده ✓</option><option value="notdone">انجام‌نشده ✕</option></select></div>
+      <div class="field"><label for="taskNote">یادداشت (اختیاری)</label><textarea id="taskNote" placeholder="جزئیات یا توضیحات..."></textarea></div>
+      <div class="modal-actions"><button class="btn" type="submit">ذخیره وظیفه</button><button class="btn secondary" type="button" id="cancelTask">انصراف</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-back" id="habitModal">
+  <div class="modal">
+    <h3>عادت جدید</h3>
+    <form id="habitForm">
+      <div class="field"><label>عنوان عادت</label><input id="habitName" required maxlength="80" placeholder="مثلاً ۲۰ دقیقه مطالعه"></div>
+      <div class="modal-actions"><button class="btn" type="submit">ذخیره عادت</button><button class="btn secondary" type="button" id="cancelHabit">انصراف</button></div>
+    </form>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const fa = n => new Intl.NumberFormat('fa-IR').format(n);
+  const todayKey = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  };
+  const dateKey = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const parseDate = key => { const [y,m,d]=key.split('-').map(Number); return new Date(y,m-1,d,12); };
+  const store = {
+    read(k, fallback){try{return JSON.parse(localStorage.getItem(k)) ?? fallback}catch{return fallback}},
+    write(k,v){localStorage.setItem(k,JSON.stringify(v))}
+  };
+  let tasks = store.read('myday_tasks', []);
+  let habits = store.read('myday_habits', []);
+  let habitChecks = store.read('myday_habit_checks', {});
+  let journals = store.read('myday_journals', {});
+  let goals = store.read('myday_goals', []);
+  let selectedDate = todayKey();
+
+  function notify(msg){
+    $('toast').textContent=msg; $('toast').classList.add('show');
+    setTimeout(()=>$('toast').classList.remove('show'),2100);
+  }
+  function saveTasks(){store.write('myday_tasks',tasks)}
+  function fmtPersian(key){
+    return new Intl.DateTimeFormat('fa-IR-u-ca-persian',{year:'numeric',month:'long',day:'numeric'}).format(parseDate(key));
+  }
+  function fmtGregorian(key){
+    return new Intl.DateTimeFormat('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).format(parseDate(key));
+  }
+  function updateDate(){
+    const now=new Date(), key=todayKey();
+    $('persianDate').textContent=fmtPersian(key);
+    $('gregDate').textContent=fmtGregorian(key);
+    $('clock').textContent=new Intl.DateTimeFormat('en-GB',{hour:'2-digit',minute:'2-digit'}).format(now);
+  }
+  function migrateOverdue(){
+    const today=todayKey();
+    const moved=[];
+    tasks.forEach(t=>{
+      if(t.date<today && t.status!=='done' && !t.carriedTo){
+        moved.push({...t,id:crypto.randomUUID(),date:today,status:'pending',carriedFrom:t.date,carriedTo:null});
+        t.carriedTo=today;
+      }
+    });
+    if(moved.length){tasks.push(...moved);saveTasks();}
+  }
+  function tasksFor(key){return tasks.filter(t=>t.date===key && !t.carriedTo)}
+  function statusInfo(s){
+    if(s==='done')return {symbol:'✓',label:'انجام‌شده',cls:'done'};
+    if(s==='notdone')return {symbol:'✕',label:'انجام‌نشده',cls:'no'};
+    return {symbol:'○',label:'در حال انتظار',cls:''};
+  }
+  function cycleStatus(id){
+    const t=tasks.find(x=>x.id===id); if(!t)return;
+    t.status=t.status==='pending'?'done':t.status==='done'?'notdone':'pending';
+    saveTasks(); renderAll();
+  }
+  function taskCard(t, showDate=false){
+    const st=statusInfo(t.status);
+    const div=document.createElement('div'); div.className='task '+(t.status==='done'?'done':'');
+    const status=document.createElement('button'); status.className='status-btn '+st.cls; status.textContent=st.symbol; status.title=st.label; status.onclick=()=>cycleStatus(t.id);
+    const main=document.createElement('div'); main.className='task-main';
+    const title=document.createElement('div'); title.className='task-title'; title.textContent=t.title;
+    const meta=document.createElement('div'); meta.className='task-meta';
+    if(t.time){const tm=document.createElement('span');tm.textContent='◷ '+t.time;meta.append(tm)}
+    if(t.priority==='high'){const p=document.createElement('span');p.className='priority';p.textContent='★ اولویت بالا';meta.append(p)}
+    const s=document.createElement('span');s.textContent=st.label;meta.append(s);
+    if(showDate){const d=document.createElement('span');d.textContent=fmtPersian(t.date);meta.append(d)}
+    main.append(title,meta);
+    if(t.note){const note=document.createElement('div');note.className='note';note.textContent=t.note;main.append(note)}
+    const actions=document.createElement('div');actions.className='task-actions';
+    const edit=document.createElement('button');edit.className='icon-btn';edit.textContent='✎';edit.title='ویرایش';edit.onclick=()=>openTask(t);
+    const del=document.createElement('button');del.className='icon-btn';del.textContent='⌫';del.title='حذف';del.onclick=()=>{if(confirm('این وظیفه حذف شود؟')){tasks=tasks.filter(x=>x.id!==t.id);saveTasks();renderAll()}};
+    actions.append(edit,del);div.append(status,main,actions);return div;
+  }
+  function renderHome(){
+    const list=tasksFor(todayKey()).sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99'));
+    $('taskList').replaceChildren();
+    if(!list.length){const e=document.createElement('div');e.className='empty';e.innerHTML='هنوز وظیفه‌ای برای امروز نداری.<br>با یک قدم کوچک شروع کن ✦';$('taskList').append(e)}
+    else list.forEach(t=>$('taskList').append(taskCard(t)));
+    const total=list.length, done=list.filter(t=>t.status==='done').length, pct=total?Math.round(done/total*100):0;
+    $('totalCount').textContent=fa(total);$('doneCount').textContent=fa(done);$('scoreCount').textContent=fa(pct)+'٪';
+    $('progressText').textContent=fa(pct)+'٪';$('progressFill').style.width=pct+'%';
+    $('taskSubtitle').textContent=total?`${fa(done)} از ${fa(total)} وظیفه انجام شده`:'قدم‌های کوچک، نتیجه‌های بزرگ';
+  }
+  function renderHistory(){
+    const key=$('historyDate').value||todayKey(), list=tasksFor(key);
+    $('historySummary').textContent=`${fmtPersian(key)} · ${fa(list.length)} وظیفه · ${fa(list.filter(t=>t.status==='done').length)} انجام‌شده`;
+    $('historyList').replaceChildren();
+    if(!list.length){const e=document.createElement('div');e.className='empty';e.textContent='برای این روز وظیفه‌ای ثبت نشده است.';$('historyList').append(e)}
+    else list.forEach(t=>$('historyList').append(taskCard(t,true)));
+  }
+  function renderHabits(){
+    const key=todayKey(); $('habitList').replaceChildren();
+    if(!habits.length){const e=document.createElement('div');e.className='empty';e.textContent='هنوز عادتی نساخته‌ای. اولین عادت کوچک خودت را اضافه کن.';$('habitList').append(e);return}
+    habits.forEach(h=>{
+      const done=(habitChecks[key]||[]).includes(h.id);
+      const card=document.createElement('div');card.className='task';
+      const b=document.createElement('button');b.className='status-btn '+(done?'done':'');b.textContent=done?'✓':'○';b.onclick=()=>{
+        habitChecks[key]=habitChecks[key]||[];
+        habitChecks[key]=done?habitChecks[key].filter(x=>x!==h.id):[...habitChecks[key],h.id];
+        store.write('myday_habit_checks',habitChecks);renderHabits();
+      };
+      const m=document.createElement('div');m.className='task-main';
+      const t=document.createElement('div');t.className='task-title';t.textContent=h.name;
+      const meta=document.createElement('div');meta.className='task-meta';meta.textContent=done?'امروز انجام شد':'برای امروز ثبت نشده';
+      m.append(t,meta);
+      const del=document.createElement('button');del.className='icon-btn';del.textContent='⌫';del.onclick=()=>{if(confirm('این عادت حذف شود؟')){habits=habits.filter(x=>x.id!==h.id);store.write('myday_habits',habits);renderHabits()}};
+      card.append(b,m,del);$('habitList').append(card);
+    });
+  }
+  function renderJournal(){
+    $('journalText').value=journals[todayKey()]||'';
+    $('goalList').replaceChildren();
+    if(!goals.length){$('goalList').textContent='';return}
+    goals.forEach(g=>{
+      const row=document.createElement('div');row.className='day-row';
+      const label=document.createElement('span');label.textContent=g.name;
+      const del=document.createElement('button');del.className='icon-btn';del.textContent='⌫';del.onclick=()=>{goals=goals.filter(x=>x.id!==g.id);store.write('myday_goals',goals);renderJournal()};
+      row.append(label,del);$('goalList').append(row);
+    });
+  }
+  function getStreak(){
+    let count=0; const d=new Date(); d.setHours(12,0,0,0);
+    // A streak begins with today if today is successful, otherwise yesterday.
+    const todayList=tasksFor(dateKey(d));
+    if(!todayList.length || todayList.some(t=>t.status!=='done')) d.setDate(d.getDate()-1);
+    for(let i=0;i<370;i++){
+      const list=tasksFor(dateKey(d));
+      if(!list.length || list.some(t=>t.status!=='done'))break;
+      count++;d.setDate(d.getDate()-1);
+    }
+    return count;
+  }
+  function renderReports(){
+    const list=tasksFor(todayKey()),done=list.filter(t=>t.status==='done').length,pct=list.length?Math.round(done/list.length*100):0;
+    $('reportScore').textContent=fa(pct)+'٪';
+    $('reportDetail').textContent=list.length?`${fa(done)} از ${fa(list.length)} وظیفه امروز انجام شده است.`:'هنوز وظیفه‌ای ثبت نشده است.';
+    $('streak').textContent=fa(getStreak())+' روز';
+    $('weeklyReport').replaceChildren();
+    for(let i=6;i>=0;i--){
+      const d=new Date();d.setDate(d.getDate()-i);const key=dateKey(d),arr=tasksFor(key),n=arr.length, dn=arr.filter(t=>t.status==='done').length;
+      const row=document.createElement('div');row.className='day-row';
+      const day=document.createElement('span');day.textContent=new Intl.DateTimeFormat('fa-IR',{weekday:'long',day:'numeric',month:'short'}).format(d);
+      const val=document.createElement('strong');val.style.color='var(--ice)';val.textContent=n?`${fa(dn)} / ${fa(n)}`:'—';
+      row.append(day,val);$('weeklyReport').append(row);
+    }
+  }
+  function renderAll(){renderHome();renderHistory();renderHabits();renderJournal();renderReports()}
+  function openTask(t=null){
+    $('taskForm').reset();$('taskId').value=t?.id||'';$('modalTitle').textContent=t?'ویرایش وظیفه':'وظیفه جدید';
+    $('taskName').value=t?.title||'';$('taskTime').value=t?.time||'';$('taskPriority').value=t?.priority||'normal';
+    $('taskStatus').value=t?.status||'pending';$('taskNote').value=t?.note||'';
+    $('taskModal').classList.add('show');setTimeout(()=>$('taskName').focus(),100);
+  }
+  function closeTask(){$('taskModal').classList.remove('show')}
+  $('taskForm').addEventListener('submit',e=>{
+    e.preventDefault();const title=$('taskName').value.trim();if(!title)return;
+    const id=$('taskId').value;
+    const data={title,time:$('taskTime').value,priority:$('taskPriority').value,status:$('taskStatus').value,note:$('taskNote').value.trim()};
+    if(id){const t=tasks.find(x=>x.id===id);Object.assign(t,data)}
+    else tasks.push({id:crypto.randomUUID(),date:todayKey(),...data,carriedTo:null});
+    saveTasks();closeTask();renderAll();notify('وظیفه ذخیره شد');
+  });
+  $('quickAdd').onclick=$('addTop').onclick=()=>openTask();
+  $('cancelTask').onclick=closeTask;
+  $('taskModal').addEventListener('click',e=>{if(e.target===$('taskModal'))closeTask()});
+  $('addHabit').onclick=()=>$('habitModal').classList.add('show');
+  $('cancelHabit').onclick=()=>$('habitModal').classList.remove('show');
+  $('habitForm').addEventListener('submit',e=>{e.preventDefault();const name=$('habitName').value.trim();if(!name)return;habits.push({id:crypto.randomUUID(),name});store.write('myday_habits',habits);$('habitForm').reset();$('habitModal').classList.remove('show');renderHabits();notify('عادت اضافه شد')});
+  $('saveJournal').onclick=()=>{journals[todayKey()]=$('journalText').value;store.write('myday_journals',journals);notify('یادداشت ذخیره شد')};
+  $('addGoal').onclick=()=>{const name=$('goalInput').value.trim();if(!name)return;goals.push({id:crypto.randomUUID(),name});store.write('myday_goals',goals);$('goalInput').value='';renderJournal()};
+  $('historyDate').value=todayKey();$('historyDate').onchange=renderHistory;
+  document.querySelectorAll('.nav-item').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('.nav-item').forEach(x=>x.classList.toggle('active',x===b));
+    document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===b.dataset.view));
+    document.querySelector('.quick').style.display=b.dataset.view==='homeView'?'flex':'none';
+    if(b.dataset.view==='journalView')renderJournal();
+    if(b.dataset.view==='reportsView')renderReports();
+  });
+  migrateOverdue();updateDate();renderAll();setInterval(updateDate,1000);
+  if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+})();
+</script>
+</body>
+</html>
